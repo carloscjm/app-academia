@@ -141,6 +141,15 @@
     border-bottom: 1px solid var(--linha);
   }
 
+  .exercicios .nome-ex {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .exercicios .vazio { color: var(--apagado); }
+  .exercicios li.editavel { align-items: center; }
+
   .exercicios .series {
     flex: none;
     font-family: var(--titulo);
@@ -150,9 +159,10 @@
     white-space: nowrap;
   }
 
-  .desfazer {
+  .acoes { margin-top: 22px; }
+
+  .discreto {
     display: block;
-    margin: 22px 0 0;
     padding: 10px 0;
     color: var(--apagado);
     font-size: 15px;
@@ -160,7 +170,100 @@
     text-underline-offset: 3px;
   }
 
-  .desfazer[hidden] { display: none; }
+  .discreto[hidden] { display: none; }
+
+  /* Edição dos exercícios */
+  .excluir {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin: -9px 0;
+    border: 1px solid var(--linha);
+    border-radius: 50%;
+    color: var(--texto);
+  }
+
+  .excluir:active { background: var(--verde-escuro); }
+
+  .edicao { margin-top: 24px; }
+
+  /* Durante a edição não há o botão fixo "Concluir treino". */
+  body.editando #hoje { padding-bottom: 40px; }
+  body.editando .aviso { bottom: calc(20px + env(safe-area-inset-bottom)); }
+
+  .alcance {
+    margin: 0 0 20px;
+    color: var(--apagado);
+    font-size: 15px;
+  }
+
+  .campo {
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .campo span {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--apagado);
+    font-size: 14px;
+  }
+
+  .campo input {
+    display: block;
+    width: 100%;
+    height: 50px;
+    padding: 0 14px;
+    border: 1px solid var(--linha);
+    border-radius: 10px;
+    background: #06130b;
+    color: var(--texto);
+    font: inherit;
+    outline: none;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  .campo input:focus { border-color: var(--verde); }
+
+  .par {
+    display: flex;
+    gap: 12px;
+  }
+
+  .par .campo {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .adicionar, .pronto {
+    display: block;
+    width: 100%;
+    height: 54px;
+    border-radius: 14px;
+    font-family: var(--titulo);
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: 0.01em;
+  }
+
+  .adicionar {
+    margin-top: 4px;
+    border: 2px solid var(--verde);
+    color: var(--verde);
+  }
+
+  .adicionar:active { background: var(--verde-escuro); }
+
+  .pronto {
+    margin: 12px 0 8px;
+    background: var(--verde);
+    color: var(--preto);
+  }
+
+  .pronto:active { background: #1ea956; }
 
   .rodape {
     position: fixed;
@@ -314,7 +417,33 @@
     </div>
     <ol class="trilha" id="trilha"></ol>
     <ul class="exercicios" id="exercicios"></ul>
-    <button class="desfazer" id="desfazer" hidden>Desfazer última conclusão</button>
+    <div class="acoes" id="acoes">
+      <button class="discreto" id="editar">Editar exercícios</button>
+      <button class="discreto" id="desfazer" hidden>Desfazer última conclusão</button>
+    </div>
+
+    <div class="edicao" id="edicao" hidden>
+      <p class="alcance" id="alcance"></p>
+      <form id="novo" autocomplete="off" novalidate>
+        <label class="campo">
+          <span>Novo exercício</span>
+          <input id="novo-nome" type="text" maxlength="60" enterkeyhint="next" autocapitalize="sentences">
+        </label>
+        <div class="par">
+          <label class="campo">
+            <span>Séries</span>
+            <input id="novo-series" type="text" inputmode="numeric" maxlength="2" enterkeyhint="next">
+          </label>
+          <label class="campo">
+            <span>Repetições</span>
+            <input id="novo-reps" type="text" maxlength="16" enterkeyhint="done">
+          </label>
+        </div>
+        <button class="adicionar" type="submit">Adicionar exercício</button>
+      </form>
+      <button class="pronto" id="pronto">Pronto</button>
+      <button class="discreto" id="restaurar" hidden>Restaurar lista sugerida</button>
+    </div>
   </section>
 
   <section class="tela" id="ciclo" role="tabpanel" aria-labelledby="aba-ciclo" hidden></section>
@@ -467,18 +596,35 @@
     try { localStorage.setItem(CHAVE, texto); } catch (e) {}
   }
 
+  var MAX_EXERCICIOS = 40;
+
+  function limparLista(lista) {
+    var limpa = [];
+    lista.forEach(function (ex) {
+      if (!Array.isArray(ex) || typeof ex[0] !== "string" || !ex[0].trim()) return;
+      limpa.push([ex[0].trim().slice(0, 60), typeof ex[1] === "string" ? ex[1].trim().slice(0, 30) : ""]);
+    });
+    return limpa.slice(0, MAX_EXERCICIOS);
+  }
+
   function carregar() {
-    var estado = { pos: 0, ciclos: 0 };
+    // "listas" guarda só os treinos que você editou; os outros usam a lista sugerida.
+    var estado = { pos: 0, ciclos: 0, listas: {} };
     try {
       var dado = JSON.parse(lerBruto() || "null");
       if (dado && Number.isInteger(dado.pos) && dado.pos >= 0 && dado.pos < TOTAL) estado.pos = dado.pos;
       if (dado && Number.isInteger(dado.ciclos) && dado.ciclos >= 0) estado.ciclos = dado.ciclos;
+      if (dado && dado.listas && typeof dado.listas === "object") {
+        Object.keys(TREINOS).forEach(function (chave) {
+          if (Array.isArray(dado.listas[chave])) estado.listas[chave] = limparLista(dado.listas[chave]);
+        });
+      }
     } catch (e) {}
     return estado;
   }
 
   function salvar() {
-    gravarBruto(JSON.stringify({ pos: estado.pos, ciclos: estado.ciclos }));
+    gravarBruto(JSON.stringify({ pos: estado.pos, ciclos: estado.ciclos, listas: estado.listas }));
   }
 
   var estado = carregar();
@@ -493,8 +639,17 @@
     return n;
   }
 
+  function chaveEm(pos) {
+    return SEMANAS[Math.floor(pos / POR_SEMANA)][pos % POR_SEMANA];
+  }
+
   function treinoEm(pos) {
-    return TREINOS[SEMANAS[Math.floor(pos / POR_SEMANA)][pos % POR_SEMANA]];
+    return TREINOS[chaveEm(pos)];
+  }
+
+  // Os exercícios de um treino: a lista que você editou ou, se não editou, a sugerida.
+  function listaDe(chave) {
+    return estado.listas[chave] || TREINOS[chave].exercicios;
   }
 
   // ---------- Tela Hoje ----------
@@ -536,16 +691,34 @@
       trilha.appendChild(grupo);
     }
 
+    var chave = chaveEm(estado.pos);
+    var exercicios = listaDe(chave);
     var lista = $("exercicios");
     lista.textContent = "";
-    treino.exercicios.forEach(function (ex) {
-      var li = el("li");
-      li.appendChild(el("span", null, ex[0]));
-      li.appendChild(el("span", "series", ex[1]));
+    exercicios.forEach(function (ex, indice) {
+      var li = el("li", editando ? "editavel" : null);
+      li.appendChild(el("span", "nome-ex", ex[0]));
+      if (ex[1]) li.appendChild(el("span", "series", ex[1]));
+      if (editando) {
+        var botao = el("button", "excluir");
+        botao.type = "button";
+        botao.setAttribute("aria-label", "Excluir " + ex[0]);
+        botao.innerHTML = ICONE_EXCLUIR;
+        botao.addEventListener("click", function () { excluirExercicio(indice); });
+        li.appendChild(botao);
+      }
       lista.appendChild(li);
     });
+    if (!exercicios.length) lista.appendChild(el("li", "vazio", "Nenhum exercício neste treino."));
 
+    document.body.classList.toggle("editando", editando);
+    $("acoes").hidden = editando;
+    $("edicao").hidden = !editando;
     $("desfazer").hidden = estado.pos === 0 && estado.ciclos === 0;
+    $("alcance").textContent = "O que você mudar vale para todos os treinos de " + treino.nome + " do ciclo.";
+    $("restaurar").hidden = !estado.listas[chave];
+    armarRestaurar(false);
+    atualizarRodape();
     ajustarNome();
   }
 
@@ -574,10 +747,10 @@
         if (situacao === "atual") resumo.appendChild(el("span", "estado", "Hoje"));
         det.appendChild(resumo);
         var ul = el("ul");
-        treino.exercicios.forEach(function (ex) {
+        listaDe(chave).forEach(function (ex) {
           var li = el("li");
           li.appendChild(document.createTextNode(ex[0]));
-          li.appendChild(el("span", null, ex[1]));
+          if (ex[1]) li.appendChild(el("span", null, ex[1]));
           ul.appendChild(li);
         });
         det.appendChild(ul);
@@ -639,33 +812,126 @@
     avisar("Conclusão desfeita");
   }
 
-  // ---------- Navegação entre as telas ----------
-  // A tela Ciclo usa o hash, então o botão voltar do Android retorna para Hoje.
-  function mostrarTela() {
-    var noCiclo = location.hash === "#ciclo";
-    $("hoje").hidden = noCiclo;
-    $("ciclo").hidden = !noCiclo;
-    $("rodape").hidden = noCiclo;
-    $("aba-hoje").setAttribute("aria-selected", String(!noCiclo));
-    $("aba-ciclo").setAttribute("aria-selected", String(noCiclo));
-    window.scrollTo(0, 0);
-    if (!noCiclo) ajustarNome();
+  // ---------- Edição dos exercícios do treino do dia ----------
+  var editando = false;
+  var ICONE_EXCLUIR = '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">' +
+    '<path d="M2 2l10 10M12 2L2 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+  // A mudança vale para o tipo do treino (ex.: todo "Pernas"), não só para o dia.
+  function editarLista(mudar) {
+    var chave = chaveEm(estado.pos);
+    var nova = listaDe(chave).slice();
+    mudar(nova);
+    estado.listas[chave] = nova;
+    salvar();
+    desenharHoje();
+    desenharCiclo();
   }
 
+  function formatarSeries(series, reps) {
+    series = series.replace(/\D/g, "").replace(/^0+/, "");
+    reps = reps.trim().replace(/\s*[-–—]\s*/g, "–");
+    if (series && reps) return series + " × " + reps;
+    if (series) return series + (series === "1" ? " série" : " séries");
+    if (/^\d+(–\d+)?$/.test(reps)) return reps + " reps";
+    return reps;
+  }
+
+  function adicionarExercicio(evento) {
+    evento.preventDefault();
+    var nome = $("novo-nome").value.trim();
+    if (!nome) {
+      $("novo-nome").focus();
+      avisar("Escreva o nome do exercício");
+      return;
+    }
+    if (listaDe(chaveEm(estado.pos)).length >= MAX_EXERCICIOS) {
+      avisar("Este treino já tem " + MAX_EXERCICIOS + " exercícios");
+      return;
+    }
+    var series = formatarSeries($("novo-series").value, $("novo-reps").value);
+    editarLista(function (lista) { lista.push([nome.slice(0, 60), series]); });
+    $("novo").reset();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    avisar("Exercício adicionado");
+  }
+
+  function excluirExercicio(indice) {
+    editarLista(function (lista) { lista.splice(indice, 1); });
+    avisar("Exercício excluído");
+  }
+
+  // Restaurar apaga o que você adicionou, então pede um segundo toque.
+  var relogioRestaurar = null;
+
+  function armarRestaurar(armado) {
+    var botao = $("restaurar");
+    clearTimeout(relogioRestaurar);
+    botao.dataset.armado = armado ? "1" : "";
+    botao.textContent = armado ? "Toque de novo para restaurar" : "Restaurar lista sugerida";
+    if (armado) relogioRestaurar = setTimeout(function () { armarRestaurar(false); }, 3500);
+  }
+
+  function restaurar() {
+    if (!$("restaurar").dataset.armado) {
+      armarRestaurar(true);
+      return;
+    }
+    delete estado.listas[chaveEm(estado.pos)];
+    salvar();
+    desenharHoje();
+    desenharCiclo();
+    avisar("Lista sugerida restaurada");
+  }
+
+  // ---------- Navegação entre as telas ----------
+  // Ciclo e edição usam o hash, então o botão voltar do Android retorna para Hoje.
+  var telaAtual = null;
+
+  function atualizarRodape() {
+    $("rodape").hidden = location.hash === "#ciclo" || editando;
+  }
+
+  function mostrarTela() {
+    var tela = location.hash === "#ciclo" ? "ciclo" : location.hash === "#editar" ? "editar" : "hoje";
+    var noCiclo = tela === "ciclo";
+    editando = tela === "editar";
+    $("hoje").hidden = noCiclo;
+    $("ciclo").hidden = !noCiclo;
+    $("aba-hoje").setAttribute("aria-selected", String(!noCiclo));
+    $("aba-ciclo").setAttribute("aria-selected", String(noCiclo));
+    if (noCiclo) atualizarRodape();
+    else desenharHoje();
+    if (noCiclo || telaAtual === "ciclo" || telaAtual === null) window.scrollTo(0, 0);
+    telaAtual = tela;
+  }
+
+  // Depois de mudar o hash, já redesenha, sem esperar o evento hashchange.
   $("aba-ciclo").addEventListener("click", function () {
-    if (location.hash !== "#ciclo") location.hash = "#ciclo";
+    if (location.hash === "#editar") location.replace("#ciclo");
+    else if (location.hash !== "#ciclo") location.hash = "#ciclo";
+    mostrarTela();
   });
 
   $("aba-hoje").addEventListener("click", function () {
     if (location.hash === "#ciclo") history.back();
   });
 
+  $("editar").addEventListener("click", function () {
+    location.hash = "#editar";
+    mostrarTela();
+  });
+  $("pronto").addEventListener("click", function () {
+    if (location.hash === "#editar") history.back();
+  });
+  $("novo").addEventListener("submit", adicionarExercicio);
+  $("restaurar").addEventListener("click", restaurar);
+
   window.addEventListener("hashchange", mostrarTela);
   window.addEventListener("resize", ajustarNome);
   $("concluir").addEventListener("click", concluir);
   $("desfazer").addEventListener("click", desfazer);
 
-  desenharHoje();
   desenharCiclo();
   mostrarTela();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarNome);
