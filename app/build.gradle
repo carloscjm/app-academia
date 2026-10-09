@@ -1,0 +1,51 @@
+plugins {
+    id 'com.android.application'
+}
+
+// No GitHub Actions cada build recebe um número maior, então o APK novo
+// sempre instala por cima do anterior sem apagar o progresso.
+def numeroDoBuild = (System.getenv('GITHUB_RUN_NUMBER') ?: '1') as Integer
+
+android {
+    namespace = 'com.carloscjm.academia'
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = 'com.carloscjm.academia'
+        minSdk = 26
+        targetSdk = 34
+        versionCode = numeroDoBuild
+        versionName = "1.0.${numeroDoBuild}"
+    }
+
+    // Chave fixa e versionada de propósito: é um app pessoal, e assinar sempre
+    // com a mesma chave é o que permite atualizar sem desinstalar.
+    signingConfigs {
+        fixa {
+            storeFile = file('assinatura.jks')
+            storePassword = 'academia'
+            keyAlias = 'academia'
+            keyPassword = 'academia'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = false
+            signingConfig = signingConfigs.fixa
+        }
+        debug {
+            signingConfig = signingConfigs.fixa
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
+}
