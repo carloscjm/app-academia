@@ -4,6 +4,7 @@
 
     <color name="preto">#000000</color>
     <color name="verde">#25C866</color>
+    <color name="icone_fundo">#06130F</color>
 
     <style name="Tema" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/preto</item>

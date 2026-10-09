@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- A arte (gato com halter) é uma imagem que cobre a tela inteira do ícone;
+     a cor de fundo só aparece se algum launcher deslocar a camada da frente. -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@color/preto" />
+    <background android:drawable="@color/icone_fundo" />
     <foreground android:drawable="@drawable/ic_launcher_foreground" />
 </adaptive-icon>
