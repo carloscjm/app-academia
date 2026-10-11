@@ -69,6 +69,8 @@
     border-bottom: 3px solid transparent;
   }
 
+  .abas[hidden] { display: none; }
+
   .aba[aria-selected="true"] {
     color: var(--texto);
     border-bottom-color: var(--verde);
@@ -166,11 +168,31 @@
 
   .exercicios li {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 15px 0;
+    gap: 14px;
+    padding: 12px 0;
     border-bottom: 1px solid var(--linha);
+  }
+
+  /* Miniatura da foto do exercício; ao tocar na linha abre a demonstração. */
+  .ver {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .mini {
+    flex: none;
+    display: block;
+    width: 54px;
+    height: 36px;
+    border-radius: 5px;
+    object-fit: cover;
+    background: var(--verde-escuro);
   }
 
   .exercicios .nome-ex {
@@ -223,7 +245,7 @@
 
   /* Durante a edição não há o botão fixo "Concluir treino". */
   body.editando #hoje { padding-bottom: 40px; }
-  body.editando .aviso { bottom: calc(20px + env(safe-area-inset-bottom)); }
+  body.sem-rodape .aviso { bottom: calc(20px + env(safe-area-inset-bottom)); }
 
   .alcance {
     margin: 0 0 20px;
@@ -243,7 +265,7 @@
     font-size: 14px;
   }
 
-  .campo input {
+  .campo input, .campo select {
     display: block;
     width: 100%;
     height: 50px;
@@ -258,7 +280,16 @@
     user-select: text;
   }
 
-  .campo input:focus { border-color: var(--verde); }
+  .campo input:focus, .campo select:focus { border-color: var(--verde); }
+
+  .campo select {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 40px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%237fa08b' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+  }
 
   .par {
     display: flex;
@@ -428,17 +459,268 @@
 
   .treino ul span { flex: none; white-space: nowrap; }
 
+  /* Barra de voltar (telas de um exercício e de cadastro) */
+  .topo { padding: 12px var(--margem) 0; }
+  .topo[hidden] { display: none; }
+
+  .voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding-right: 12px;
+    font-family: var(--titulo);
+    font-size: 24px;
+    color: var(--texto);
+  }
+
+  .so-leitor {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* Lista de exercícios */
+  #biblioteca { padding-bottom: 40px; }
+
+  .busca {
+    display: block;
+    margin: 24px 0 0;
+  }
+
+  .busca input {
+    display: block;
+    width: 100%;
+    height: 50px;
+    padding: 0 14px;
+    border: 1px solid var(--linha);
+    border-radius: 10px;
+    background: #06130b;
+    color: var(--texto);
+    font: inherit;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  .busca input:focus { border-color: var(--verde); }
+  .busca input::placeholder { color: var(--apagado); }
+  .busca input::-webkit-search-cancel-button { display: none; }
+
+  .filtros {
+    display: flex;
+    gap: 8px;
+    margin: 14px calc(-1 * var(--margem)) 0;
+    padding: 2px var(--margem);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .filtros::-webkit-scrollbar { display: none; }
+
+  .filtro {
+    flex: none;
+    height: 38px;
+    padding: 0 15px;
+    border: 1px solid var(--linha);
+    border-radius: 99px;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+
+  .filtro[aria-pressed="true"] {
+    border-color: var(--verde);
+    background: var(--verde);
+    color: var(--preto);
+    font-weight: 500;
+  }
+
+  .resumo-lista {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .resumo-lista p {
+    margin: 0;
+    color: var(--apagado);
+    font-size: 15px;
+  }
+
+  .catalogo {
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--linha);
+  }
+
+  .catalogo li { border-bottom: 1px solid var(--linha); }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 10px 0;
+    text-align: left;
+  }
+
+  .item .mini {
+    width: 72px;
+    height: 48px;
+    border-radius: 6px;
+  }
+
+  .item-texto {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .item-nome {
+    display: block;
+    overflow-wrap: anywhere;
+  }
+
+  .item-sub {
+    display: block;
+    margin-top: 2px;
+    color: var(--apagado);
+    font-size: 14px;
+  }
+
+  .sem-resultado {
+    padding: 22px 0;
+    color: var(--apagado);
+  }
+
+  #mais { margin-top: 18px; }
+  #mais[hidden] { display: none; }
+
+  /* Tela de um exercício */
+  #detalhe, #novo-tela { padding-bottom: 40px; }
+
+  /* As duas fotos (posição inicial e final) ficam uma sobre a outra e alternam. */
+  .demo {
+    position: relative;
+    margin-top: 10px;
+    aspect-ratio: 3 / 2;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #060606;
+  }
+
+  .demo.retrato { aspect-ratio: 4 / 5; }
+  .demo[hidden] { display: none; }
+
+  .demo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .demo .fim { animation: alterna 2.6s infinite; }
+
+  @keyframes alterna {
+    0%, 42% { opacity: 0; }
+    50%, 92% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .legenda {
+    margin: 8px 0 0;
+    color: var(--apagado);
+    font-size: 14px;
+  }
+
+  .legenda[hidden] { display: none; }
+
+  .nome-detalhe {
+    margin: 22px 0 0;
+    font-family: var(--titulo);
+    font-weight: 800;
+    font-size: 38px;
+    line-height: 1.05;
+    color: var(--verde);
+    overflow-wrap: anywhere;
+  }
+
+  .ficha {
+    margin: 16px 0 0;
+    border-top: 1px solid var(--linha);
+  }
+
+  .ficha div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--linha);
+  }
+
+  .ficha dt { color: var(--apagado); }
+
+  .ficha dd {
+    margin: 0;
+    text-align: right;
+  }
+
+  .bloco { margin-top: 28px; }
+
+  .bloco h2 {
+    margin: 0 0 14px;
+    font-family: var(--titulo);
+    font-weight: 800;
+    font-size: 28px;
+    line-height: 1;
+  }
+
+  .pronto:disabled {
+    background: var(--verde-escuro);
+    color: var(--apagado);
+  }
+
+  #form-novo { margin-top: 22px; }
+
   @media (prefers-reduced-motion: reduce) {
     .troca { animation: none; }
     .aviso { transition: none; }
+    /* Sem animação: as duas fotos lado a lado. */
+    .demo, .demo.retrato {
+      display: flex;
+      gap: 4px;
+      aspect-ratio: auto;
+    }
+    .demo img {
+      position: static;
+      width: calc(50% - 2px);
+      height: auto;
+    }
+    .demo .fim { animation: none; }
   }
 </style>
 </head>
 <body>
 
-<nav class="abas" role="tablist" aria-label="Telas">
+<nav class="abas" id="abas" role="tablist" aria-label="Telas">
   <button class="aba" id="aba-hoje" role="tab" aria-controls="hoje" aria-selected="true">Hoje</button>
   <button class="aba" id="aba-ciclo" role="tab" aria-controls="ciclo" aria-selected="false">Ciclo</button>
+  <button class="aba" id="aba-exercicios" role="tab" aria-controls="biblioteca" aria-selected="false">Exercícios</button>
+</nav>
+
+<nav class="topo" id="topo" hidden>
+  <button class="voltar" id="voltar">
+    <svg width="11" height="18" viewBox="0 0 11 18" aria-hidden="true"><path d="M9 2L2 9l7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Voltar
+  </button>
 </nav>
 
 <main>
@@ -456,29 +738,73 @@
 
     <div class="edicao" id="edicao" hidden>
       <p class="alcance" id="alcance"></p>
-      <form id="novo" autocomplete="off" novalidate>
-        <label class="campo">
-          <span>Novo exercício</span>
-          <input id="novo-nome" type="text" maxlength="60" enterkeyhint="next" autocapitalize="sentences">
-        </label>
-        <div class="par">
-          <label class="campo">
-            <span>Séries</span>
-            <input id="novo-series" type="text" inputmode="numeric" maxlength="2" enterkeyhint="next">
-          </label>
-          <label class="campo">
-            <span>Repetições</span>
-            <input id="novo-reps" type="text" maxlength="16" enterkeyhint="done">
-          </label>
-        </div>
-        <button class="adicionar" type="submit">Adicionar exercício</button>
-      </form>
+      <button class="adicionar" id="ir-lista">Adicionar da lista de exercícios</button>
       <button class="pronto" id="pronto">Pronto</button>
       <button class="discreto" id="restaurar" hidden>Restaurar lista sugerida</button>
     </div>
   </section>
 
   <section class="tela" id="ciclo" role="tabpanel" aria-labelledby="aba-ciclo" hidden></section>
+
+  <section class="tela" id="biblioteca" role="tabpanel" aria-labelledby="aba-exercicios" hidden>
+    <label class="busca">
+      <span class="so-leitor">Buscar exercício</span>
+      <input id="busca" type="search" placeholder="Buscar exercício" autocomplete="off" enterkeyhint="search">
+    </label>
+    <div class="filtros" id="filtros" role="group" aria-label="Filtrar por músculo"></div>
+    <div class="resumo-lista">
+      <p id="contagem"></p>
+      <button class="discreto" id="abrir-novo">Cadastrar exercício</button>
+    </div>
+    <ul class="catalogo" id="catalogo"></ul>
+    <button class="adicionar" id="mais" hidden>Mostrar mais</button>
+  </section>
+
+  <section class="tela" id="detalhe" hidden>
+    <div class="demo" id="demo"></div>
+    <p class="legenda" id="legenda">As fotos alternam entre o início e o fim do movimento.</p>
+    <h1 class="nome-detalhe" id="d-nome"></h1>
+    <dl class="ficha" id="d-ficha"></dl>
+
+    <form class="bloco" id="form-add" autocomplete="off" novalidate>
+      <h2>Adicionar ao treino</h2>
+      <label class="campo">
+        <span>Treino</span>
+        <select id="add-treino"></select>
+      </label>
+      <div class="par">
+        <label class="campo">
+          <span>Séries</span>
+          <input id="add-series" type="text" inputmode="numeric" maxlength="2" enterkeyhint="next">
+        </label>
+        <label class="campo">
+          <span>Repetições</span>
+          <input id="add-reps" type="text" maxlength="16" enterkeyhint="done">
+        </label>
+      </div>
+      <button class="pronto" id="add-botao" type="submit">Adicionar ao treino</button>
+    </form>
+    <button class="discreto" id="excluir-meu" hidden>Excluir este exercício</button>
+  </section>
+
+  <section class="tela" id="novo-tela" hidden>
+    <h1 class="nome-detalhe">Cadastrar exercício</h1>
+    <form id="form-novo" autocomplete="off" novalidate>
+      <label class="campo">
+        <span>Nome</span>
+        <input id="novo-nome" type="text" maxlength="60" enterkeyhint="next" autocapitalize="sentences">
+      </label>
+      <label class="campo">
+        <span>Músculo principal</span>
+        <select id="novo-musculo"></select>
+      </label>
+      <label class="campo">
+        <span>Equipamento</span>
+        <select id="novo-equip"></select>
+      </label>
+      <button class="pronto" type="submit">Cadastrar</button>
+    </form>
+  </section>
 </main>
 
 <div class="rodape" id="rodape">
@@ -487,11 +813,13 @@
 
 <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
 
+<script src="exercicios.js"></script>
 <script>
 (function () {
   "use strict";
 
   // ---------- Treinos ----------
+  // Cada exercício sugerido: [nome, séries × repetições, id no catálogo (exercicios.js)].
   var TREINOS = {
     peitoTriceps: {
       nome: "Peito / Tríceps",
@@ -500,11 +828,11 @@
         { linhas: ["Tríceps"], figura: "costas", acesos: ["triceps"] }
       ],
       exercicios: [
-        ["Supino reto com barra", "4 × 8–10"],
-        ["Supino inclinado com halteres", "3 × 10–12"],
-        ["Peck deck", "3 × 12–15"],
-        ["Tríceps na polia com corda", "3 × 10–12"],
-        ["Tríceps testa", "3 × 10–12"]
+        ["Supino reto com barra", "4 × 8–10", 152],
+        ["Supino inclinado com halteres", "3 × 10–12", 184],
+        ["Peck deck", "3 × 12–15", 158],
+        ["Tríceps na polia com corda", "3 × 10–12", 672],
+        ["Tríceps testa", "3 × 10–12", 632]
       ]
     },
     costasBiceps: {
@@ -514,12 +842,12 @@
         { linhas: ["Bíceps"], figura: "frente", acesos: ["biceps"] }
       ],
       exercicios: [
-        ["Puxada frontal", "4 × 8–10"],
-        ["Remada curvada", "3 × 8–10"],
-        ["Remada baixa", "3 × 10–12"],
-        ["Pulldown", "3 × 12–15"],
-        ["Rosca direta", "3 × 10–12"],
-        ["Rosca martelo", "3 × 10–12"]
+        ["Puxada frontal", "4 × 8–10", 334],
+        ["Remada curvada", "3 × 8–10", 355],
+        ["Remada baixa", "3 × 10–12", 375],
+        ["Pulldown", "3 × 12–15", 329],
+        ["Rosca direta", "3 × 10–12", 87],
+        ["Rosca martelo", "3 × 10–12", 102]
       ]
     },
     pernas: {
@@ -528,12 +856,12 @@
         { linhas: ["Pernas"], figura: "pernasFrente", acesos: ["quadriceps", "adutores", "panturrilha"] }
       ],
       exercicios: [
-        ["Agachamento livre", "4 × 8–10"],
-        ["Leg press 45°", "3 × 10–12"],
-        ["Cadeira extensora", "3 × 12–15"],
-        ["Mesa flexora", "3 × 10–12"],
-        ["Stiff", "3 × 10–12"],
-        ["Panturrilha em pé", "4 × 12–15"]
+        ["Agachamento livre", "4 × 8–10", 393],
+        ["Leg press 45°", "3 × 10–12", 432],
+        ["Cadeira extensora", "3 × 12–15", 431],
+        ["Mesa flexora", "3 × 10–12", 277],
+        ["Stiff", "3 × 10–12", 302],
+        ["Panturrilha em pé", "4 × 12–15", 148]
       ]
     },
     ombros: {
@@ -542,11 +870,11 @@
         { linhas: ["Ombros"], figura: "frente", acesos: ["ombroAnt", "ombroLat"] }
       ],
       exercicios: [
-        ["Desenvolvimento com halteres", "4 × 8–10"],
-        ["Elevação lateral", "4 × 12–15"],
-        ["Elevação frontal", "3 × 12"],
-        ["Crucifixo inverso", "3 × 12–15"],
-        ["Encolhimento", "3 × 12"]
+        ["Desenvolvimento com halteres", "4 × 8–10", 516],
+        ["Elevação lateral", "4 × 12–15", 569],
+        ["Elevação frontal", "3 × 12", 522],
+        ["Crucifixo inverso", "3 × 12–15", 559],
+        ["Encolhimento", "3 × 12", 598]
       ]
     },
     tricepsBiceps: {
@@ -556,12 +884,12 @@
         { linhas: ["Bíceps"], figura: "frente", acesos: ["biceps"] }
       ],
       exercicios: [
-        ["Rosca com barra W", "4 × 8–10"],
-        ["Tríceps na polia com barra", "4 × 10–12"],
-        ["Rosca alternada", "3 × 10–12"],
-        ["Tríceps francês", "3 × 10–12"],
-        ["Rosca Scott", "3 × 10–12"],
-        ["Tríceps coice", "3 × 12–15"]
+        ["Rosca com barra W", "4 × 8–10", 100],
+        ["Tríceps na polia com barra", "4 × 10–12", 671],
+        ["Rosca alternada", "3 × 10–12", 97],
+        ["Tríceps francês", "3 × 10–12", 663],
+        ["Rosca Scott", "3 × 10–12", 115],
+        ["Tríceps coice", "3 × 12–15", 669]
       ]
     },
     peitoOmbroAnt: {
@@ -571,11 +899,11 @@
         { linhas: ["Ombro", "ant."], figura: "frente", acesos: ["ombroAnt"] }
       ],
       exercicios: [
-        ["Supino inclinado com barra", "4 × 8–10"],
-        ["Supino reto com halteres", "3 × 10–12"],
-        ["Crossover", "3 × 12–15"],
-        ["Desenvolvimento militar", "3 × 8–10"],
-        ["Elevação frontal", "3 × 12"]
+        ["Supino inclinado com barra", "4 × 8–10", 154],
+        ["Supino reto com halteres", "3 × 10–12", 171],
+        ["Crossover", "3 × 12–15", 160],
+        ["Desenvolvimento militar", "3 × 8–10", 585],
+        ["Elevação frontal", "3 × 12", 522]
       ]
     },
     costasOmbroPost: {
@@ -585,11 +913,11 @@
         { linhas: ["Ombro", "post."], figura: "costas", acesos: ["ombroPost"] }
       ],
       exercicios: [
-        ["Barra fixa ou puxada", "4 × 8–10"],
-        ["Remada cavalinho", "3 × 8–10"],
-        ["Remada unilateral", "3 × 10–12"],
-        ["Crucifixo inverso", "3 × 12–15"],
-        ["Face pull", "3 × 12–15"]
+        ["Barra fixa", "4 × 8–10", 323],
+        ["Remada cavalinho", "3 × 8–10", 381],
+        ["Remada unilateral", "3 × 10–12", 371],
+        ["Crucifixo inverso", "3 × 12–15", 559],
+        ["Face pull", "3 × 12–15", 520]
       ]
     },
     peitoCostas: {
@@ -599,12 +927,12 @@
         { linhas: ["Costas"], figura: "costas", acesos: ["costas"] }
       ],
       exercicios: [
-        ["Supino reto com barra", "4 × 8–10"],
-        ["Puxada frontal", "4 × 8–10"],
-        ["Supino inclinado com halteres", "3 × 10–12"],
-        ["Remada baixa", "3 × 10–12"],
-        ["Crossover", "3 × 12–15"],
-        ["Pulldown", "3 × 12–15"]
+        ["Supino reto com barra", "4 × 8–10", 152],
+        ["Puxada frontal", "4 × 8–10", 334],
+        ["Supino inclinado com halteres", "3 × 10–12", 184],
+        ["Remada baixa", "3 × 10–12", 375],
+        ["Crossover", "3 × 12–15", 160],
+        ["Pulldown", "3 × 12–15", 329]
       ]
     },
     pernasAnt: {
@@ -613,11 +941,11 @@
         { linhas: ["Pernas", "ant."], figura: "pernasFrente", acesos: ["quadriceps"] }
       ],
       exercicios: [
-        ["Agachamento livre", "4 × 8–10"],
-        ["Leg press 45°", "4 × 10–12"],
-        ["Afundo búlgaro", "3 × 10 por perna"],
-        ["Cadeira extensora", "3 × 12–15"],
-        ["Panturrilha em pé", "4 × 12–15"]
+        ["Agachamento livre", "4 × 8–10", 393],
+        ["Leg press 45°", "4 × 10–12", 432],
+        ["Afundo búlgaro", "3 × 10 por perna", 466],
+        ["Cadeira extensora", "3 × 12–15", 431],
+        ["Panturrilha em pé", "4 × 12–15", 148]
       ]
     },
     pernasPost: {
@@ -626,11 +954,11 @@
         { linhas: ["Pernas", "post."], figura: "pernasCostas", acesos: ["gluteo", "posterior", "panturrilha"] }
       ],
       exercicios: [
-        ["Stiff", "4 × 8–10"],
-        ["Mesa flexora", "4 × 10–12"],
-        ["Cadeira flexora", "3 × 12"],
-        ["Elevação pélvica", "3 × 10–12"],
-        ["Panturrilha sentado", "4 × 15"]
+        ["Stiff", "4 × 8–10", 302],
+        ["Mesa flexora", "4 × 10–12", 277],
+        ["Cadeira flexora", "3 × 12", 295],
+        ["Elevação pélvica", "3 × 10–12", 243],
+        ["Panturrilha sentado", "4 × 15", 144]
       ]
     }
   };
@@ -714,6 +1042,25 @@
   var POR_SEMANA = 5;
   var TOTAL = SEMANAS.length * POR_SEMANA;
 
+  // ---------- Catálogo de exercícios (exercicios.js) ----------
+  var MUSCULOS = window.MUSCULOS || [];
+  var EQUIPAMENTOS = window.EQUIPAMENTOS || [];
+
+  function semAcento(texto) {
+    return String(texto).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim();
+  }
+
+  var porId = {};
+  var idPorNome = {};
+  var itensBase = (window.CATALOGO || []).map(function (c) {
+    var item = { id: c[0], nome: c[1], musculo: c[2], equip: c[3], sec: c[4] || [], retrato: !!c[5], busca: semAcento(c[1]), meu: false };
+    porId[item.id] = item;
+    idPorNome[item.busca] = item.id;
+    return item;
+  });
+  // Nome que as versões anteriores do app usavam para este exercício sugerido.
+  idPorNome["barra fixa ou puxada"] = 323;
+
   // ---------- Armazenamento local ----------
   var CHAVE = "academia.estado";
 
@@ -733,19 +1080,45 @@
   }
 
   var MAX_EXERCICIOS = 40;
+  var MAX_MEUS = 200;
 
+  function idValido(id) {
+    return Number.isInteger(id) || (typeof id === "string" && /^c\d+$/.test(id));
+  }
+
+  // Cada exercício de um treino: [nome, séries × repetições, id no catálogo (opcional)].
   function limparLista(lista) {
     var limpa = [];
     lista.forEach(function (ex) {
       if (!Array.isArray(ex) || typeof ex[0] !== "string" || !ex[0].trim()) return;
-      limpa.push([ex[0].trim().slice(0, 60), typeof ex[1] === "string" ? ex[1].trim().slice(0, 30) : ""]);
+      var item = [ex[0].trim().slice(0, 60), typeof ex[1] === "string" ? ex[1].trim().slice(0, 30) : ""];
+      if (idValido(ex[2])) item.push(ex[2]);
+      limpa.push(item);
     });
     return limpa.slice(0, MAX_EXERCICIOS);
   }
 
+  // Exercícios cadastrados por você: { id: "c1", nome, musculo, equip }.
+  function limparMeus(lista) {
+    var limpos = [];
+    var vistos = {};
+    lista.forEach(function (m) {
+      if (!m || typeof m.id !== "string" || !/^c\d+$/.test(m.id) || vistos[m.id]) return;
+      if (typeof m.nome !== "string" || !m.nome.trim()) return;
+      vistos[m.id] = true;
+      limpos.push({
+        id: m.id,
+        nome: m.nome.trim().slice(0, 60),
+        musculo: Number.isInteger(m.musculo) && m.musculo >= 0 && m.musculo < MUSCULOS.length ? m.musculo : 0,
+        equip: Number.isInteger(m.equip) && m.equip >= 0 && m.equip < EQUIPAMENTOS.length ? m.equip : -1
+      });
+    });
+    return limpos.slice(0, MAX_MEUS);
+  }
+
   function carregar() {
     // "listas" guarda só os treinos que você editou; os outros usam a lista sugerida.
-    var estado = { pos: 0, ciclos: 0, listas: {} };
+    var estado = { pos: 0, ciclos: 0, listas: {}, meus: [] };
     try {
       var dado = JSON.parse(lerBruto() || "null");
       if (dado && Number.isInteger(dado.pos) && dado.pos >= 0 && dado.pos < TOTAL) estado.pos = dado.pos;
@@ -755,12 +1128,13 @@
           if (Array.isArray(dado.listas[chave])) estado.listas[chave] = limparLista(dado.listas[chave]);
         });
       }
+      if (dado && Array.isArray(dado.meus)) estado.meus = limparMeus(dado.meus);
     } catch (e) {}
     return estado;
   }
 
   function salvar() {
-    gravarBruto(JSON.stringify({ pos: estado.pos, ciclos: estado.ciclos, listas: estado.listas }));
+    gravarBruto(JSON.stringify({ pos: estado.pos, ciclos: estado.ciclos, listas: estado.listas, meus: estado.meus }));
   }
 
   var estado = carregar();
@@ -786,6 +1160,40 @@
   // Os exercícios de um treino: a lista que você editou ou, se não editou, a sugerida.
   function listaDe(chave) {
     return estado.listas[chave] || TREINOS[chave].exercicios;
+  }
+
+  function itemMeu(m) {
+    return { id: m.id, nome: m.nome, musculo: m.musculo, equip: m.equip, sec: [], retrato: false, busca: semAcento(m.nome), meu: true };
+  }
+
+  function exercicioPorId(id) {
+    if (id == null) return null;
+    if (porId[id]) return porId[id];
+    for (var i = 0; i < estado.meus.length; i++) {
+      if (estado.meus[i].id === id) return itemMeu(estado.meus[i]);
+    }
+    return null;
+  }
+
+  // O exercício do catálogo ligado a uma linha do treino: pelo id ou, nas listas antigas, pelo nome.
+  function vinculo(ex) {
+    return exercicioPorId(ex[2] != null ? ex[2] : idPorNome[semAcento(ex[0])]);
+  }
+
+  function miniatura(item) {
+    if (!item || item.meu) return el("span", "mini");
+    var img = el("img", "mini");
+    img.src = "ex/" + item.id + "t.webp";
+    img.alt = "";
+    img.loading = "lazy";
+    img.width = 72;
+    img.height = 48;
+    return img;
+  }
+
+  function abrir(hash) {
+    location.hash = hash;
+    mostrarTela();
   }
 
   // ---------- Tela Hoje ----------
@@ -854,8 +1262,17 @@
     var lista = $("exercicios");
     lista.textContent = "";
     exercicios.forEach(function (ex, indice) {
+      var item = vinculo(ex);
       var li = el("li", editando ? "editavel" : null);
-      li.appendChild(el("span", "nome-ex", ex[0]));
+      // Fora da edição, tocar na linha abre a demonstração do exercício.
+      var corpo = el(item && !editando ? "button" : "span", "ver");
+      if (item && !editando) {
+        corpo.type = "button";
+        corpo.addEventListener("click", function () { abrir("#exercicio/" + item.id); });
+      }
+      corpo.appendChild(miniatura(item));
+      corpo.appendChild(el("span", "nome-ex", ex[0]));
+      li.appendChild(corpo);
       if (ex[1]) li.appendChild(el("span", "series", ex[1]));
       if (editando) {
         var botao = el("button", "excluir");
@@ -876,7 +1293,6 @@
     $("alcance").textContent = "O que você mudar vale para todos os treinos de " + treino.nome + " do ciclo.";
     $("restaurar").hidden = !estado.listas[chave];
     armarRestaurar(false);
-    atualizarRodape();
     ajustarNome();
   }
 
@@ -975,17 +1391,6 @@
   var ICONE_EXCLUIR = '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">' +
     '<path d="M2 2l10 10M12 2L2 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 
-  // A mudança vale para o tipo do treino (ex.: todo "Pernas"), não só para o dia.
-  function editarLista(mudar) {
-    var chave = chaveEm(estado.pos);
-    var nova = listaDe(chave).slice();
-    mudar(nova);
-    estado.listas[chave] = nova;
-    salvar();
-    desenharHoje();
-    desenharCiclo();
-  }
-
   function formatarSeries(series, reps) {
     series = series.replace(/\D/g, "").replace(/^0+/, "");
     reps = reps.trim().replace(/\s*[-–—]\s*/g, "–");
@@ -995,39 +1400,31 @@
     return reps;
   }
 
-  function adicionarExercicio(evento) {
-    evento.preventDefault();
-    var nome = $("novo-nome").value.trim();
-    if (!nome) {
-      $("novo-nome").focus();
-      avisar("Escreva o nome do exercício");
-      return;
-    }
-    if (listaDe(chaveEm(estado.pos)).length >= MAX_EXERCICIOS) {
-      avisar("Este treino já tem " + MAX_EXERCICIOS + " exercícios");
-      return;
-    }
-    var series = formatarSeries($("novo-series").value, $("novo-reps").value);
-    editarLista(function (lista) { lista.push([nome.slice(0, 60), series]); });
-    $("novo").reset();
-    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-    avisar("Exercício adicionado");
-  }
-
+  // A mudança vale para o tipo do treino (ex.: todo "Pernas"), não só para o dia.
   function excluirExercicio(indice) {
-    editarLista(function (lista) { lista.splice(indice, 1); });
+    var chave = chaveEm(estado.pos);
+    var nova = listaDe(chave).slice();
+    nova.splice(indice, 1);
+    estado.listas[chave] = nova;
+    salvar();
+    desenharHoje();
+    desenharCiclo();
     avisar("Exercício excluído");
   }
 
-  // Restaurar apaga o que você adicionou, então pede um segundo toque.
-  var relogioRestaurar = null;
+  // Ações que apagam pedem um segundo toque no mesmo botão.
+  var relogiosDeConfirmar = {};
+
+  function armar(id, textoNormal, textoArmado, armado) {
+    var botao = $(id);
+    clearTimeout(relogiosDeConfirmar[id]);
+    botao.dataset.armado = armado ? "1" : "";
+    botao.textContent = armado ? textoArmado : textoNormal;
+    if (armado) relogiosDeConfirmar[id] = setTimeout(function () { armar(id, textoNormal, textoArmado, false); }, 3500);
+  }
 
   function armarRestaurar(armado) {
-    var botao = $("restaurar");
-    clearTimeout(relogioRestaurar);
-    botao.dataset.armado = armado ? "1" : "";
-    botao.textContent = armado ? "Toque de novo para restaurar" : "Restaurar lista sugerida";
-    if (armado) relogioRestaurar = setTimeout(function () { armarRestaurar(false); }, 3500);
+    armar("restaurar", "Restaurar lista sugerida", "Toque de novo para restaurar", armado);
   }
 
   function restaurar() {
@@ -1042,47 +1439,334 @@
     avisar("Lista sugerida restaurada");
   }
 
-  // ---------- Navegação entre as telas ----------
-  // Ciclo e edição usam o hash, então o botão voltar do Android retorna para Hoje.
-  var telaAtual = null;
+  // ---------- Tela Exercícios (catálogo) ----------
+  var POR_PAGINA = 80;
+  var filtro = { musculo: -1, texto: "", limite: POR_PAGINA };
 
-  function atualizarRodape() {
-    $("rodape").hidden = location.hash === "#ciclo" || editando;
+  function todosOsItens() {
+    var itens = estado.meus.map(itemMeu).concat(itensBase);
+    itens.sort(function (a, b) { return a.busca < b.busca ? -1 : a.busca > b.busca ? 1 : 0; });
+    return itens;
+  }
+
+  function descricao(item) {
+    var partes = [MUSCULOS[item.musculo]];
+    if (item.equip >= 0) partes.push(EQUIPAMENTOS[item.equip]);
+    if (item.meu) partes.push("cadastrado por você");
+    return partes.join(" / ");
+  }
+
+  function desenharFiltros() {
+    var caixa = $("filtros");
+    caixa.textContent = "";
+    ["Todos"].concat(MUSCULOS).forEach(function (nome, i) {
+      var musculo = i - 1;
+      var botao = el("button", "filtro", nome);
+      botao.type = "button";
+      botao.setAttribute("aria-pressed", String(filtro.musculo === musculo));
+      botao.addEventListener("click", function () {
+        filtro.musculo = musculo;
+        filtro.limite = POR_PAGINA;
+        desenharFiltros();
+        desenharCatalogo();
+      });
+      caixa.appendChild(botao);
+    });
+  }
+
+  function desenharCatalogo() {
+    var palavras = semAcento(filtro.texto).split(/\s+/).filter(Boolean);
+    var itens = todosOsItens().filter(function (item) {
+      if (filtro.musculo >= 0 && item.musculo !== filtro.musculo) return false;
+      return palavras.every(function (p) { return item.busca.indexOf(p) >= 0; });
+    });
+
+    var n = itens.length;
+    var texto = n === 1 ? "1 exercício" : n + " exercícios";
+    if (filtro.musculo >= 0) texto += " de " + MUSCULOS[filtro.musculo];
+    $("contagem").textContent = texto;
+
+    var lista = $("catalogo");
+    lista.textContent = "";
+    itens.slice(0, filtro.limite).forEach(function (item) {
+      var li = el("li");
+      var botao = el("button", "item");
+      botao.type = "button";
+      botao.appendChild(miniatura(item));
+      var textoItem = el("span", "item-texto");
+      textoItem.appendChild(el("span", "item-nome", item.nome));
+      textoItem.appendChild(el("span", "item-sub", descricao(item)));
+      botao.appendChild(textoItem);
+      botao.addEventListener("click", function () { abrir("#exercicio/" + item.id); });
+      li.appendChild(botao);
+      lista.appendChild(li);
+    });
+    if (!n) lista.appendChild(el("li", "sem-resultado", "Nenhum exercício encontrado. Você pode cadastrar o seu."));
+
+    var resto = n - filtro.limite;
+    $("mais").hidden = resto <= 0;
+    if (resto > 0) $("mais").textContent = "Mostrar mais " + Math.min(resto, POR_PAGINA);
+  }
+
+  var relogioBusca = null;
+  $("busca").addEventListener("input", function () {
+    clearTimeout(relogioBusca);
+    relogioBusca = setTimeout(function () {
+      filtro.texto = $("busca").value;
+      filtro.limite = POR_PAGINA;
+      desenharCatalogo();
+    }, 120);
+  });
+
+  $("mais").addEventListener("click", function () {
+    filtro.limite += POR_PAGINA;
+    desenharCatalogo();
+  });
+
+  // ---------- Tela de um exercício ----------
+  var detalheId = null;
+
+  function jaNoTreino(chave, id) {
+    return listaDe(chave).some(function (ex) {
+      var item = vinculo(ex);
+      return item && item.id === id;
+    });
+  }
+
+  function atualizarAdicionar() {
+    var chave = $("add-treino").value;
+    var ja = jaNoTreino(chave, detalheId);
+    var botao = $("add-botao");
+    botao.disabled = ja;
+    botao.textContent = ja ? "Já está neste treino" : "Adicionar ao treino";
+  }
+
+  function desenharDetalhe(id) {
+    var item = exercicioPorId(id);
+    var mudou = detalheId !== id;
+    detalheId = id;
+
+    var demo = $("demo");
+    if (mudou) {
+      demo.textContent = "";
+      demo.className = "demo" + (item.retrato ? " retrato" : "");
+      if (!item.meu) {
+        [["a", "Posição inicial", ""], ["b", "Posição final", "fim"]].forEach(function (f) {
+          var img = el("img", f[2]);
+          img.src = "ex/" + item.id + f[0] + ".webp";
+          img.alt = f[1] + ": " + item.nome;
+          demo.appendChild(img);
+        });
+      }
+    }
+    demo.hidden = item.meu;
+    $("legenda").hidden = item.meu;
+    $("d-nome").textContent = item.nome;
+
+    var ficha = $("d-ficha");
+    ficha.textContent = "";
+    var linhas = [["Músculo principal", MUSCULOS[item.musculo]]];
+    if (item.sec.length) linhas.push(["Também trabalha", item.sec.map(function (m) { return MUSCULOS[m]; }).join(", ")]);
+    if (item.equip >= 0) linhas.push(["Equipamento", EQUIPAMENTOS[item.equip]]);
+    if (item.meu) linhas.push(["Origem", "Cadastrado por você"]);
+    linhas.forEach(function (l) {
+      var div = el("div");
+      div.appendChild(el("dt", null, l[0]));
+      div.appendChild(el("dd", null, l[1]));
+      ficha.appendChild(div);
+    });
+
+    if (mudou) {
+      var hoje = chaveEm(estado.pos);
+      var seletor = $("add-treino");
+      seletor.textContent = "";
+      Object.keys(TREINOS).forEach(function (chave) {
+        var op = el("option", null, TREINOS[chave].nome + (chave === hoje ? " (hoje)" : ""));
+        op.value = chave;
+        seletor.appendChild(op);
+      });
+      seletor.value = hoje;
+      $("add-series").value = "3";
+      $("add-reps").value = "10–12";
+    }
+    atualizarAdicionar();
+
+    $("excluir-meu").hidden = !item.meu;
+    armar("excluir-meu", "Excluir este exercício", "Toque de novo para excluir", false);
+  }
+
+  function adicionarAoTreino(evento) {
+    evento.preventDefault();
+    var item = exercicioPorId(detalheId);
+    var chave = $("add-treino").value;
+    if (!item || !TREINOS[chave] || jaNoTreino(chave, item.id)) return;
+    var lista = listaDe(chave).slice();
+    if (lista.length >= MAX_EXERCICIOS) {
+      avisar("Este treino já tem " + MAX_EXERCICIOS + " exercícios");
+      return;
+    }
+    lista.push([item.nome, formatarSeries($("add-series").value, $("add-reps").value), item.id]);
+    estado.listas[chave] = lista;
+    salvar();
+    desenharCiclo();
+    atualizarAdicionar();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    avisar("Adicionado ao treino " + TREINOS[chave].nome);
+  }
+
+  function excluirMeu() {
+    if (!$("excluir-meu").dataset.armado) {
+      armar("excluir-meu", "Excluir este exercício", "Toque de novo para excluir", true);
+      return;
+    }
+    estado.meus = estado.meus.filter(function (m) { return m.id !== detalheId; });
+    salvar();
+    desenharCatalogo();
+    history.back();
+    avisar("Exercício excluído da lista");
+  }
+
+  $("add-treino").addEventListener("change", atualizarAdicionar);
+  $("form-add").addEventListener("submit", adicionarAoTreino);
+  $("excluir-meu").addEventListener("click", excluirMeu);
+
+  // ---------- Cadastro de exercício ----------
+  function prepararCadastro() {
+    var musculo = $("novo-musculo");
+    musculo.textContent = "";
+    MUSCULOS.forEach(function (nome, i) {
+      var op = el("option", null, nome);
+      op.value = String(i);
+      musculo.appendChild(op);
+    });
+    if (filtro.musculo >= 0) musculo.value = String(filtro.musculo);
+
+    var equip = $("novo-equip");
+    equip.textContent = "";
+    var nenhum = el("option", null, "Não informar");
+    nenhum.value = "-1";
+    equip.appendChild(nenhum);
+    EQUIPAMENTOS.forEach(function (nome, i) {
+      var op = el("option", null, nome);
+      op.value = String(i);
+      equip.appendChild(op);
+    });
+    $("novo-nome").value = "";
+  }
+
+  function cadastrar(evento) {
+    evento.preventDefault();
+    var nome = $("novo-nome").value.trim().slice(0, 60);
+    if (!nome) {
+      $("novo-nome").focus();
+      avisar("Escreva o nome do exercício");
+      return;
+    }
+    var igual = todosOsItens().filter(function (item) { return item.busca === semAcento(nome); })[0];
+    if (igual) {
+      avisar("Já existe um exercício com esse nome");
+      return;
+    }
+    if (estado.meus.length >= MAX_MEUS) {
+      avisar("Limite de " + MAX_MEUS + " exercícios cadastrados");
+      return;
+    }
+    var maior = 0;
+    estado.meus.forEach(function (m) { maior = Math.max(maior, Number(m.id.slice(1))); });
+    var novo = { id: "c" + (maior + 1), nome: nome, musculo: Number($("novo-musculo").value), equip: Number($("novo-equip").value) };
+    estado.meus.push(novo);
+    salvar();
+    desenharCatalogo();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    // Troca a tela de cadastro pela do exercício, já pronto para adicionar a um treino.
+    location.replace("#exercicio/" + novo.id);
+    mostrarTela();
+    avisar("Exercício cadastrado");
+  }
+
+  $("form-novo").addEventListener("submit", cadastrar);
+
+  // ---------- Navegação entre as telas ----------
+  // As telas usam o hash do endereço, então o botão voltar do Android funciona entre elas.
+  // O histórico fica sempre: Hoje, depois no máximo uma aba (ou a edição), depois no máximo
+  // uma tela de exercício ou de cadastro.
+  var telaAtual = null;
+  var rolagens = {};
+
+  function rota() {
+    var h = location.hash;
+    if (h === "#ciclo") return { tela: "ciclo" };
+    if (h === "#editar") return { tela: "hoje", editando: true };
+    if (h === "#exercicios") return { tela: "biblioteca" };
+    if (h === "#novo") return { tela: "novo" };
+    if (h.indexOf("#exercicio/") === 0) {
+      var bruto = h.slice(11);
+      var id = /^\d+$/.test(bruto) ? Number(bruto) : bruto;
+      if (exercicioPorId(id)) return { tela: "detalhe", id: id };
+      return { tela: "biblioteca" };
+    }
+    return { tela: "hoje" };
   }
 
   function mostrarTela() {
-    var tela = location.hash === "#ciclo" ? "ciclo" : location.hash === "#editar" ? "editar" : "hoje";
-    var noCiclo = tela === "ciclo";
-    editando = tela === "editar";
-    $("hoje").hidden = noCiclo;
-    $("ciclo").hidden = !noCiclo;
-    $("aba-hoje").setAttribute("aria-selected", String(!noCiclo));
-    $("aba-ciclo").setAttribute("aria-selected", String(noCiclo));
-    if (noCiclo) atualizarRodape();
-    else desenharHoje();
-    if (noCiclo || telaAtual === "ciclo" || telaAtual === null) window.scrollTo(0, 0);
-    telaAtual = tela;
+    var r = rota();
+    var chaveTela = r.tela + (r.editando ? ":editar" : "");
+    var mudou = telaAtual !== chaveTela;
+    if (mudou && telaAtual) rolagens[telaAtual] = window.scrollY;
+
+    editando = !!r.editando;
+    $("hoje").hidden = r.tela !== "hoje";
+    $("ciclo").hidden = r.tela !== "ciclo";
+    $("biblioteca").hidden = r.tela !== "biblioteca";
+    $("detalhe").hidden = r.tela !== "detalhe";
+    $("novo-tela").hidden = r.tela !== "novo";
+
+    var telaCheia = r.tela === "detalhe" || r.tela === "novo";
+    $("abas").hidden = telaCheia;
+    $("topo").hidden = !telaCheia;
+    $("aba-hoje").setAttribute("aria-selected", String(r.tela === "hoje"));
+    $("aba-ciclo").setAttribute("aria-selected", String(r.tela === "ciclo"));
+    $("aba-exercicios").setAttribute("aria-selected", String(r.tela === "biblioteca"));
+
+    var semRodape = r.tela !== "hoje" || editando;
+    $("rodape").hidden = semRodape;
+    document.body.classList.toggle("sem-rodape", semRodape);
+
+    if (r.tela === "hoje") desenharHoje();
+    if (r.tela === "detalhe") desenharDetalhe(r.id);
+    if (r.tela === "novo" && mudou) prepararCadastro();
+
+    if (mudou) {
+      var vindoDeTelaCheia = telaAtual === "detalhe" || telaAtual === "novo";
+      var entreHojeEEdicao = telaAtual && telaAtual.indexOf("hoje") === 0 && r.tela === "hoje";
+      if (vindoDeTelaCheia && !telaCheia) window.scrollTo(0, rolagens[chaveTela] || 0);
+      else if (!entreHojeEEdicao) window.scrollTo(0, 0);
+    }
+    telaAtual = chaveTela;
   }
 
-  // Depois de mudar o hash, já redesenha, sem esperar o evento hashchange.
-  $("aba-ciclo").addEventListener("click", function () {
-    if (location.hash === "#editar") location.replace("#ciclo");
-    else if (location.hash !== "#ciclo") location.hash = "#ciclo";
+  // Troca de aba: a partir de Hoje empilha; a partir de outra aba (ou da edição) substitui.
+  function irParaAba(hash) {
+    if (location.hash === hash) return;
+    if (location.hash === "") location.hash = hash;
+    else location.replace(hash);
     mostrarTela();
-  });
+  }
 
   $("aba-hoje").addEventListener("click", function () {
-    if (location.hash === "#ciclo") history.back();
+    if (location.hash !== "") history.back();
   });
+  $("aba-ciclo").addEventListener("click", function () { irParaAba("#ciclo"); });
+  $("aba-exercicios").addEventListener("click", function () { irParaAba("#exercicios"); });
 
-  $("editar").addEventListener("click", function () {
-    location.hash = "#editar";
-    mostrarTela();
-  });
+  $("voltar").addEventListener("click", function () { history.back(); });
+  $("abrir-novo").addEventListener("click", function () { abrir("#novo"); });
+
+  $("editar").addEventListener("click", function () { abrir("#editar"); });
+  $("ir-lista").addEventListener("click", function () { irParaAba("#exercicios"); });
   $("pronto").addEventListener("click", function () {
     if (location.hash === "#editar") history.back();
   });
-  $("novo").addEventListener("submit", adicionarExercicio);
   $("restaurar").addEventListener("click", restaurar);
 
   window.addEventListener("hashchange", mostrarTela);
@@ -1090,6 +1774,8 @@
   $("concluir").addEventListener("click", concluir);
   $("desfazer").addEventListener("click", desfazer);
 
+  desenharFiltros();
+  desenharCatalogo();
   desenharCiclo();
   mostrarTela();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarNome);
