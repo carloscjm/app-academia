@@ -16,8 +16,9 @@ Para atualizar, basta instalar o APK novo por cima do antigo: o progresso é man
 
 A aba **Exercícios** traz um catálogo com mais de 670 exercícios de musculação (barra, halteres,
 máquinas, polia, peso do corpo, kettlebell e outros), com busca e filtro por músculo. Tocando em um
-exercício aparecem duas fotos alternando, a posição inicial e a final do movimento, e o botão para
-adicioná-lo a um dos treinos, com séries e repetições. Também dá para cadastrar um exercício próprio
+exercício aparecem duas fotos alternando (a posição inicial e a final do movimento), um mapa do corpo
+de frente e de costas com o músculo principal e os secundários acesos, e o botão para adicioná-lo a um
+dos treinos, com séries e repetições. Também dá para cadastrar um exercício próprio
 (sem foto).
 
 Na tela **Hoje**, **Editar exercícios** permite tirar exercícios do treino do dia e ir à lista para
